@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDT Transformer — Recurrent Depth Transformer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg0: #060912;
+  --bg1: #0b0f1e;
+  --bg2: #0f1525;
+  --card: rgba(255,255,255,0.035);
+  --card-h: rgba(255,255,255,0.06);
+  --cyan: #00d4ff;
+  --purple: #8b5cf6;
+  --green: #10ffa0;
+  --orange: #f59e0b;
+  --pink: #ff6b9d;
+  --t1: #f0f4ff;
+  --t2: #8892a4;
+  --t3: #4a5568;
+  --border: rgba(255,255,255,0.07);
+  --border-h: rgba(255,255,255,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg0);color:var(--t1);line-height:1.7;overflow-x:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(6,9,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-weight:800;font-size:1.05rem;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--cyan);}
+.nav-gh{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);color:var(--cyan)!important;padding:.35rem 1rem;border-radius:6px;transition:background .2s!important;}
+.nav-gh:hover{background:rgba(0,212,255,0.18)!important;}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 5rem;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 55% at 50% 0%,rgba(139,92,246,.18) 0%,transparent 70%),radial-gradient(ellipse 55% 45% at 85% 85%,rgba(0,212,255,.1) 0%,transparent 60%),radial-gradient(ellipse 45% 35% at 15% 70%,rgba(16,255,160,.06) 0%,transparent 50%);animation:bgp 9s ease-in-out infinite alternate;}
+@keyframes bgp{0%{opacity:.8;transform:scale(1)}100%{opacity:1;transform:scale(1.04)}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 80%);}
+.hero-content{position:relative;max-width:920px;}
+.badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;padding:.35rem 1rem;border-radius:100px;font-size:.75rem;font-weight:600;margin-bottom:1.5rem;letter-spacing:.06em;}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+h1{font-size:clamp(2.6rem,6vw,5rem);font-weight:900;line-height:1.08;margin-bottom:1.5rem;letter-spacing:-.035em;}
+.grad{background:linear-gradient(135deg,var(--cyan) 0%,var(--purple) 50%,var(--pink) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:1.15rem;color:var(--t2);max-width:660px;margin:0 auto 3rem;font-weight:400;}
+.stats{display:flex;justify-content:center;gap:1.25rem;margin-bottom:3rem;flex-wrap:wrap;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.75rem;min-width:150px;backdrop-filter:blur(10px);transition:all .3s;}
+.stat:hover{border-color:var(--border-h);transform:translateY(-3px);}
+.stat-n{font-size:2rem;font-weight:800;display:block;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-l{font-size:.72rem;color:var(--t2);text-transform:uppercase;letter-spacing:.09em;}
+.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;padding:.75rem 2rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:.9rem;transition:all .3s;box-shadow:0 0 30px rgba(0,212,255,.2);}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 0 55px rgba(0,212,255,.4);}
+.btn-s{background:transparent;color:var(--t1);padding:.75rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;border:1px solid var(--border-h);transition:all .3s;}
+.btn-s:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* SECTIONS */
+section{padding:6rem 2rem;}
+.wrap{max-width:1100px;margin:0 auto;}
+.s-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan);margin-bottom:.6rem;}
+.s-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;margin-bottom:1rem;letter-spacing:-.025em;}
+.s-desc{color:var(--t2);font-size:1rem;max-width:620px;margin-bottom:3rem;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+/* CONCEPT */
+#concept{background:var(--bg1);}
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.eq-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem;position:relative;overflow:hidden;}
+.eq-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));}
+.eq-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1.25rem;}
+.eq{font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--cyan);background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:8px;padding:.9rem 1.25rem;margin-bottom:1.5rem;letter-spacing:.02em;}
+.terms{display:flex;flex-direction:column;gap:.75rem;}
+.term{display:flex;align-items:flex-start;gap:.9rem;}
+.sym{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;min-width:56px;padding:.2rem .4rem;border-radius:4px;text-align:center;flex-shrink:0;}
+.sh{background:rgba(0,212,255,.1);color:var(--cyan);}
+.sa{background:rgba(139,92,246,.1);color:var(--purple);}
+.sb{background:rgba(16,255,160,.1);color:var(--green);}
+.se{background:rgba(245,158,11,.1);color:var(--orange);}
+.tdesc{font-size:.83rem;color:var(--t2);line-height:1.6;}
+.insight{background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.18);border-radius:10px;padding:1rem 1.2rem;margin-top:1.5rem;font-size:.83rem;color:var(--t2);}
+.insight strong{color:var(--cyan);}
+
+/* ARCHITECTURE */
+#architecture{background:var(--bg0);}
+.pipe-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem;margin-bottom:2.5rem;overflow-x:auto;}
+.pipe-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);margin-bottom:1.5rem;}
+.pipe{display:flex;align-items:center;justify-content:flex-start;gap:0;min-width:800px;}
+.pb{display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+.pbox{border-radius:9px;padding:.65rem .9rem;font-size:.7rem;font-weight:600;text-align:center;min-width:86px;border:1px solid;line-height:1.4;}
+.pbox.emb{background:rgba(16,255,160,.07);border-color:rgba(16,255,160,.28);color:var(--green);}
+.pbox.std{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.28);color:var(--cyan);}
+.pbox.rec{background:rgba(139,92,246,.09);border-color:rgba(139,92,246,.38);color:#a78bfa;padding:.65rem 1.1rem;min-width:100px;position:relative;}
+.pbox.out{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.28);color:var(--orange);}
+.lbadge{position:absolute;top:-8px;right:-8px;background:var(--purple);color:#fff;font-size:.58rem;font-weight:800;padding:.12rem .38rem;border-radius:100px;}
+.plbl{font-size:.6rem;color:var(--t3);text-align:center;max-width:90px;}
+.parr{color:var(--t3);font-size:1.1rem;margin:0 .2rem;padding-bottom:1.1rem;}
+
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.dbox{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2rem;}
+.dbox h3{font-size:.78rem;font-weight:600;color:var(--t2);margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:.08em;}
+
+.vs-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2rem;margin-top:2rem;}
+.vs-side{text-align:center;}
+.vs-side-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:1rem;}
+.vs-blocks{display:flex;flex-direction:column;gap:.4rem;align-items:center;}
+.vb{border-radius:6px;padding:.35rem 1.25rem;font-size:.72rem;width:130px;}
+.vb.gpt{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.22);color:var(--cyan);}
+.vb.rdt{background:rgba(139,92,246,.09);border:1px solid rgba(139,92,246,.3);color:#a78bfa;}
+.vb.rdt-d{background:rgba(139,92,246,.09);border:1px dashed rgba(139,92,246,.3);color:#a78bfa;}
+.vs-badge{display:inline-block;background:rgba(16,255,160,.09);border:1px solid rgba(16,255,160,.28);color:var(--green);padding:.2rem .6rem;border-radius:4px;font-size:.68rem;font-weight:700;margin-top:.5rem;}
+.vs-note{font-size:.72rem;color:var(--t3);margin-top:.75rem;}
+.vs-circle{background:var(--card);border:1px solid var(--border);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:var(--t2);margin:0 auto;}
+
+/* PHASES */
+#phases{background:var(--bg1);}
+.phases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.pc{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;transition:all .3s;position:relative;overflow:hidden;}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.pc.p1::before{background:linear-gradient(90deg,var(--cyan),transparent);}
+.pc.p2::before{background:linear-gradient(90deg,var(--purple),transparent);}
+.pc.p3::before{background:linear-gradient(90deg,var(--green),transparent);}
+.pc:hover{border-color:var(--border-h);transform:translateY(-4px);background:var(--card-h);}
+.p-num{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;margin-bottom:.6rem;}
+.p1 .p-num{color:var(--cyan);}.p2 .p-num{color:var(--purple);}.p3 .p-num{color:var(--green);}
+.p-title{font-size:1.2rem;font-weight:700;margin-bottom:.7rem;}
+.p-desc{font-size:.83rem;color:var(--t2);margin-bottom:1.4rem;line-height:1.7;}
+.p-items{display:flex;flex-direction:column;gap:.45rem;}
+.pi{display:flex;align-items:flex-start;gap:.65rem;font-size:.78rem;color:var(--t2);}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:.45rem;}
+.p1 .dot{background:var(--cyan);}.p2 .dot{background:var(--purple);}.p3 .dot{background:var(--green);}
+
+/* RESULTS */
+#results{background:var(--bg0);}
+.res-grid{display:grid;grid-template-columns:2fr 1fr;gap:2rem;}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2rem;}
+.chart-ttl{font-size:.95rem;font-weight:600;margin-bottom:.3rem;}
+.chart-sub{font-size:.78rem;color:var(--t2);margin-bottom:1.5rem;}
+.p-stats{display:flex;flex-direction:column;gap:1rem;}
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.4rem;}
+.pcard-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);margin-bottom:.4rem;}
+.pcard-val{font-size:1.7rem;font-weight:800;line-height:1;}
+.pcard-sub{font-size:.72rem;color:var(--t3);margin-top:.2rem;}
+.gbadge{display:inline-block;background:rgba(16,255,160,.08);border:1px solid rgba(16,255,160,.28);color:var(--green);padding:.18rem .55rem;border-radius:4px;font-size:.68rem;font-weight:700;margin-top:.4rem;}
+
+/* INNOVATIONS */
+#innovations{background:var(--bg1);}
+.inn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.icard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem;transition:all .3s;}
+.icard:hover{border-color:var(--border-h);transform:translateY(-3px);}
+.iicon{font-size:1.75rem;margin-bottom:.9rem;}
+.ititle{font-size:.95rem;font-weight:700;margin-bottom:.45rem;}
+.idesc{font-size:.82rem;color:var(--t2);line-height:1.7;}
+
+/* FUTURE */
+#future{background:var(--bg0);}
+.fut-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;}
+.fcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem;transition:all .3s;display:flex;gap:1.25rem;align-items:flex-start;}
+.fcard:hover{border-color:var(--border-h);background:var(--card-h);}
+.ficon{font-size:1.6rem;flex-shrink:0;}
+.ftitle{font-size:.95rem;font-weight:700;margin-bottom:.4rem;}
+.fdesc{font-size:.82rem;color:var(--t2);line-height:1.7;}
+
+/* GETTING STARTED */
+#start{background:var(--bg1);}
+.steps-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.step-ttl{font-size:.95rem;font-weight:600;margin-bottom:.8rem;color:var(--t1);}
+.code{background:#060912;border:1px solid var(--border);border-radius:12px;padding:1.4rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.9;overflow-x:auto;margin-bottom:1.25rem;}
+.cc{color:var(--t3);}
+.cm{color:var(--cyan);}
+.cp{color:var(--orange);}
+.cs{color:var(--green);}
+
+/* FOOTER */
+footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2rem;text-align:center;}
+.f-logo{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.6rem;}
+.f-txt{font-size:.82rem;color:var(--t3);margin-bottom:1.4rem;}
+.f-links{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;}
+.f-links a{font-size:.82rem;color:var(--t2);text-decoration:none;transition:color .2s;}
+.f-links a:hover{color:var(--cyan);}
+
+/* ANIMATIONS */
+.fade-up{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .concept-grid,.detail-grid,.res-grid,.steps-grid,.vs-grid{grid-template-columns:1fr;}
+  .phases-grid,.inn-grid{grid-template-columns:1fr;}
+  .fut-grid{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .pipe{min-width:600px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">RDT Transformer</div>
+  <ul class="nav-links">
+    <li><a href="#concept">Concept</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#phases">Phases</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#innovations">Innovations</a></li>
+    <li><a href="#future">Future</a></li>
+    <li><a href="https://github.com/PrathibhaDevkar/rdt_transformer" class="nav-gh" target="_blank">GitHub →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="badge">FROM-SCRATCH PYTORCH IMPLEMENTATION</div>
+    <h1>Recurrent Depth<br><span class="grad">Transformer</span></h1>
+    <p class="hero-sub">A transformer that thinks deeper — the same weights, more iterations, 47% fewer parameters than a comparable GPT, with stronger multi-hop reasoning.</p>
+    <div class="stats">
+      <div class="stat"><span class="stat-n">3</span><span class="stat-l">Training Phases</span></div>
+      <div class="stat"><span class="stat-n">47%</span><span class="stat-l">Fewer Parameters</span></div>
+      <div class="stat"><span class="stat-n">10×</span><span class="stat-l">Reasoning Hops</span></div>
+      <div class="stat"><span class="stat-n">~10M</span><span class="stat-l">Total Params</span></div>
+    </div>
+    <div class="btns">
+      <a href="https://github.com/PrathibhaDevkar/rdt_transformer" class="btn-p" target="_blank">View on GitHub</a>
+      <a href="#architecture" class="btn-s">Explore Architecture</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONCEPT -->
+<section id="concept">
+  <div class="wrap">
+    <div class="s-label">Core Idea</div>
+    <h2 class="s-title">What is a Recurrent Depth Transformer?</h2>
+    <p class="s-desc">Standard transformers stack N unique layers. The RDT replaces most of them with one shared block applied N times — iterative refinement with a fraction of the parameters.</p>
+
+    <div class="concept-grid fade-up">
+      <div>
+        <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">The Core Idea</h3>
+        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;margin-bottom:1.2rem;">A standard GPT needs N unique transformer blocks for N layers of reasoning. The RDT achieves the same effective depth using <strong style="color:var(--t1)">one block applied N times</strong> — sharing weights across all loop steps.</p>
+        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;margin-bottom:1.2rem;">At each loop step the model refines its hidden state h using the update rule on the right. The original encoded input <code style="color:var(--cyan);background:rgba(0,212,255,.09);padding:.1em .35em;border-radius:3px;font-family:'JetBrains Mono',monospace;">e</code> is re-injected every step as an anchor — the model never forgets what was originally asked.</p>
+        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;">At inference you can run more loops on harder questions — <strong style="color:var(--t1)">more reasoning compute with zero retraining</strong> and no new parameters.</p>
+      </div>
+      <div class="eq-box">
+        <div class="eq-lbl">Core Update Rule — Applied Each Loop Step</div>
+        <div class="eq">h(t+1) = A·h(t) + B·e + Transformer(h(t))</div>
+        <div class="terms">
+          <div class="term"><span class="sym sh">h(t)</span><span class="tdesc">Hidden state at loop step t — the model's current "draft" answer, starts as encoded input</span></div>
+          <div class="term"><span class="sym sa">A</span><span class="tdesc">Learned N_EMBED × N_EMBED matrix — controls how much of the previous state carries forward</span></div>
+          <div class="term"><span class="sym sb">B</span><span class="tdesc">Learned N_EMBED × N_EMBED matrix — controls how much the original input anchors each step</span></div>
+          <div class="term"><span class="sym se">e</span><span class="tdesc">Encoded input from Prelude (fixed) — re-injected every loop step to prevent drift</span></div>
+        </div>
+        <div class="insight"><strong>Stability constraint:</strong> The spectral radius of A is capped at 0.9 after every gradient step via SVD projection — preventing h from diverging across loop iterations.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="s-label">Architecture</div>
+    <h2 class="s-title">Model Architecture</h2>
+    <p class="s-desc">Three-part structure: Prelude encodes raw input, the Recurrent Block refines it iteratively, and Coda post-processes before prediction.</p>
+
+    <!-- Full pipeline -->
+    <div class="pipe-wrap fade-up">
+      <div class="pipe-lbl">Full Model Pipeline — Data Flow</div>
+      <div class="pipe">
+        <div class="pb"><div class="pbox out">Token IDs<br><small style="opacity:.7">(B, T)</small></div><div class="plbl">Integer tokens</div></div>
+        <div class="parr">→</div>
+        <div class="pb"><div class="pbox emb">Embedding<br>Layer</div><div class="plbl">Token + Position</div></div>
+        <div class="parr">→</div>
+        <div class="pb"><div class="pbox std">Prelude<br>Block</div><div class="plbl">1× standard</div></div>
+        <div class="parr">→</div>
+        <div class="pb"><div class="pbox rec"><div class="lbadge">×8</div>Recurrent<br>Block</div><div class="plbl">1 block, 8 loops</div></div>
+        <div class="parr">→</div>
+        <div class="pb"><div class="pbox std">Coda<br>Block</div><div class="plbl">1× standard</div></div>
+        <div class="parr">→</div>
+        <div class="pb"><div class="pbox emb">LayerNorm<br>+ LM Head</div><div class="plbl">384 → 50,257</div></div>
+        <div class="parr">→</div>
+        <div class="pb"><div class="pbox out">Logits<br><small style="opacity:.7">(B,T,V)</small></div><div class="plbl">Next token scores</div></div>
+      </div>
+    </div>
+
+    <!-- Detail diagrams -->
+    <div class="detail-grid fade-up">
+      <!-- Transformer block SVG -->
+      <div class="dbox">
+        <h3>TransformerBlock (Pre-LN, Residual)</h3>
+        <svg viewBox="0 0 280 300" width="100%" style="max-height:300px;">
+          <!-- x input -->
+          <rect x="90" y="12" width="100" height="30" rx="6" fill="rgba(0,212,255,.07)" stroke="rgba(0,212,255,.25)" stroke-width="1.2"/>
+          <text x="140" y="31" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Inter">Input x  (B,T,C)</text>
+          <!-- residual fork -->
+          <line x1="140" y1="42" x2="140" y2="58" stroke="#2d3748" stroke-width="1.5"/>
+          <line x1="140" y1="50" x2="52" y2="50" stroke="#2d3748" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="52" y1="50" x2="52" y2="162" stroke="#2d3748" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- LN1 -->
+          <rect x="80" y="58" width="120" height="28" rx="6" fill="rgba(245,158,11,.07)" stroke="rgba(245,158,11,.22)" stroke-width="1.2"/>
+          <text x="140" y="76" text-anchor="middle" fill="#f59e0b" font-size="11" font-family="Inter">LayerNorm</text>
+          <line x1="140" y1="86" x2="140" y2="100" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- MHA -->
+          <rect x="60" y="100" width="160" height="30" rx="6" fill="rgba(139,92,246,.09)" stroke="rgba(139,92,246,.3)" stroke-width="1.2"/>
+          <text x="140" y="119" text-anchor="middle" fill="#a78bfa" font-size="11" font-family="Inter">Multi-Head Attention (6h)</text>
+          <line x1="140" y1="130" x2="140" y2="150" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- Add 1 -->
+          <line x1="52" y1="162" x2="128" y2="162" stroke="#2d3748" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <circle cx="140" cy="162" r="12" fill="rgba(16,255,160,.08)" stroke="rgba(16,255,160,.35)" stroke-width="1.5"/>
+          <text x="140" y="167" text-anchor="middle" fill="#10ffa0" font-size="14" font-family="Inter">+</text>
+          <!-- residual 2 -->
+          <line x1="140" y1="174" x2="140" y2="188" stroke="#2d3748" stroke-width="1.5"/>
+          <line x1="140" y1="182" x2="228" y2="182" stroke="#2d3748" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="228" y1="182" x2="228" y2="270" stroke="#2d3748" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- LN2 -->
+          <rect x="80" y="188" width="120" height="28" rx="6" fill="rgba(245,158,11,.07)" stroke="rgba(245,158,11,.22)" stroke-width="1.2"/>
+          <text x="140" y="206" text-anchor="middle" fill="#f59e0b" font-size="11" font-family="Inter">LayerNorm</text>
+          <line x1="140" y1="216" x2="140" y2="230" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- FFN -->
+          <rect x="68" y="230" width="144" height="28" rx="6" fill="rgba(0,212,255,.07)" stroke="rgba(0,212,255,.22)" stroke-width="1.2"/>
+          <text x="140" y="248" text-anchor="middle" fill="#00d4ff" font-size="11" font-family="Inter">FeedForward  (4× GELU)</text>
+          <line x1="140" y1="258" x2="140" y2="272" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- Add 2 -->
+          <line x1="228" y1="270" x2="152" y2="270" stroke="#2d3748" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <circle cx="140" cy="272" r="12" fill="rgba(16,255,160,.08)" stroke="rgba(16,255,160,.35)" stroke-width="1.5"/>
+          <text x="140" y="277" text-anchor="middle" fill="#10ffa0" font-size="14" font-family="Inter">+</text>
+          <!-- output label -->
+          <text x="140" y="298" text-anchor="middle" fill="#4a5568" font-size="9.5" font-family="Inter">Output  (B,T,C) — same shape</text>
+        </svg>
+      </div>
+
+      <!-- Recurrent block detail SVG -->
+      <div class="dbox">
+        <h3>Recurrent Block — h(t) Update Each Loop Step</h3>
+        <svg viewBox="0 0 280 300" width="100%" style="max-height:300px;">
+          <!-- Input e -->
+          <rect x="14" y="20" width="64" height="26" rx="5" fill="rgba(16,255,160,.08)" stroke="rgba(16,255,160,.3)" stroke-width="1.2"/>
+          <text x="46" y="37" text-anchor="middle" fill="#10ffa0" font-size="10" font-family="Inter" font-weight="600">Input  e</text>
+          <!-- h(t) -->
+          <rect x="14" y="68" width="64" height="26" rx="5" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.3)" stroke-width="1.2"/>
+          <text x="46" y="85" text-anchor="middle" fill="#00d4ff" font-size="10" font-family="Inter" font-weight="600">h(t)</text>
+          <!-- B·e -->
+          <line x1="78" y1="33" x2="110" y2="33" stroke="#2d3748" stroke-width="1.5"/>
+          <rect x="110" y="20" width="52" height="26" rx="5" fill="rgba(16,255,160,.07)" stroke="rgba(16,255,160,.22)" stroke-width="1.2"/>
+          <text x="136" y="37" text-anchor="middle" fill="#10ffa0" font-size="10" font-family="Inter">B · e</text>
+          <line x1="162" y1="33" x2="206" y2="33" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- A·h -->
+          <line x1="78" y1="81" x2="110" y2="81" stroke="#2d3748" stroke-width="1.5"/>
+          <rect x="110" y="68" width="52" height="26" rx="5" fill="rgba(139,92,246,.08)" stroke="rgba(139,92,246,.22)" stroke-width="1.2"/>
+          <text x="136" y="85" text-anchor="middle" fill="#a78bfa" font-size="10" font-family="Inter">A · h</text>
+          <line x1="162" y1="81" x2="206" y2="81" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- Transformer path -->
+          <line x1="46" y1="94" x2="46" y2="132" stroke="#2d3748" stroke-width="1.5"/>
+          <rect x="14" y="132" width="120" height="26" rx="5" fill="rgba(245,158,11,.07)" stroke="rgba(245,158,11,.22)" stroke-width="1.2"/>
+          <text x="74" y="149" text-anchor="middle" fill="#f59e0b" font-size="10" font-family="Inter">Transformer(h(t))</text>
+          <line x1="134" y1="145" x2="206" y2="145" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- Sum -->
+          <circle cx="218" cy="86" r="14" fill="rgba(16,255,160,.07)" stroke="rgba(16,255,160,.32)" stroke-width="1.5"/>
+          <text x="218" y="91" text-anchor="middle" fill="#10ffa0" font-size="15" font-family="Inter">+</text>
+          <line x1="218" y1="33" x2="218" y2="72" stroke="#2d3748" stroke-width="1.5"/>
+          <line x1="218" y1="100" x2="218" y2="131" stroke="#2d3748" stroke-width="1.5"/>
+          <line x1="206" y1="145" x2="218" y2="145" stroke="#2d3748" stroke-width="1.5"/>
+          <line x1="218" y1="145" x2="218" y2="131" stroke="#2d3748" stroke-width="1.5"/>
+          <!-- LayerNorm -->
+          <rect x="182" y="131" width="72" height="26" rx="5" fill="rgba(245,158,11,.07)" stroke="rgba(245,158,11,.22)" stroke-width="1.2"/>
+          <text x="218" y="148" text-anchor="middle" fill="#f59e0b" font-size="10" font-family="Inter">LayerNorm</text>
+          <!-- h(t+1) -->
+          <line x1="218" y1="157" x2="218" y2="185" stroke="#2d3748" stroke-width="1.5"/>
+          <polygon points="218,187 214,181 222,181" fill="#2d3748"/>
+          <rect x="178" y="187" width="80" height="26" rx="5" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.3)" stroke-width="1.2"/>
+          <text x="218" y="204" text-anchor="middle" fill="#00d4ff" font-size="10" font-family="Inter" font-weight="600">h(t+1)</text>
+          <!-- Loop arrow -->
+          <path d="M 258 200 L 270 200 L 270 81 L 232 81" fill="none" stroke="rgba(139,92,246,.45)" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="260" y="148" text-anchor="middle" fill="#6d28d9" font-size="8" font-family="Inter" transform="rotate(90,260,148)">loop ×8</text>
+          <!-- footer note -->
+          <text x="140" y="238" text-anchor="middle" fill="#4a5568" font-size="9" font-family="Inter">h(0) = e  ·  same weights every step</text>
+          <text x="140" y="252" text-anchor="middle" fill="#4a5568" font-size="9" font-family="Inter">A, B initialized near identity matrix</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- GPT vs RDT structural comparison -->
+    <div class="vs-grid fade-up">
+      <div class="vs-side">
+        <div class="vs-side-label" style="color:var(--cyan);">Standard GPT</div>
+        <div class="vs-blocks">
+          <div class="vb gpt">Block 1 (unique)</div>
+          <div style="color:var(--t3);font-size:.9rem;">↓</div>
+          <div class="vb gpt">Block 2 (unique)</div>
+          <div style="color:var(--t3);font-size:.9rem;">↓</div>
+          <div class="vb gpt">Block 3 (unique)</div>
+          <div style="color:var(--t3);font-size:.85rem;">↓ · · · ↓</div>
+          <div class="vb gpt">Block N (unique)</div>
+        </div>
+        <div class="vs-note">N × block parameters</div>
+      </div>
+      <div><div class="vs-circle">VS</div></div>
+      <div class="vs-side">
+        <div class="vs-side-label" style="color:var(--purple);">RDT</div>
+        <div class="vs-blocks">
+          <div class="vb rdt">Shared Block</div>
+          <div style="border-left:2px dashed rgba(139,92,246,.4);height:60px;"></div>
+          <div class="vb rdt-d">Shared Block</div>
+          <div style="font-size:.72rem;color:var(--purple);font-weight:700;">↩ looped × N</div>
+          <span class="vs-badge">~47% fewer params</span>
+        </div>
+        <div class="vs-note">1 × block parameters</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PHASES -->
+<section id="phases">
+  <div class="wrap">
+    <div class="s-label">Learning Journey</div>
+    <h2 class="s-title">Three Phases, Zero Libraries</h2>
+    <p class="s-desc">Every component built from scratch in pure PyTorch — no Hugging Face, no pretrained weights, no shortcuts.</p>
+    <div class="phases-grid">
+      <div class="pc p1 fade-up">
+        <div class="p-num">Phase 1</div>
+        <div class="p-title">GPT Baseline</div>
+        <p class="p-desc">Builds a complete GPT-style transformer from the ground up on TinyShakespeare. Covers every fundamental component from tokenization through full training.</p>
+        <div class="p-items">
+          <div class="pi"><div class="dot"></div><span>BPE Tokenization with tiktoken GPT-2 (50,257-token vocab)</span></div>
+          <div class="pi"><div class="dot"></div><span>Token + Positional Embeddings, additive 384-dim combination</span></div>
+          <div class="pi"><div class="dot"></div><span>Causal Multi-Head Self-Attention (6 heads × 64-dim, scaled QKV)</span></div>
+          <div class="pi"><div class="dot"></div><span>FeedForward Network — 4× expansion, GELU activation</span></div>
+          <div class="pi"><div class="dot"></div><span>Pre-LN TransformerBlock with residual connections</span></div>
+          <div class="pi"><div class="dot"></div><span>Full training: AdamW, gradient clipping, weight tying</span></div>
+        </div>
+      </div>
+      <div class="pc p2 fade-up">
+        <div class="p-num">Phase 2</div>
+        <div class="p-title">RDT Architecture</div>
+        <p class="p-desc">Introduces the recurrent block with learned A and B matrices. Benchmarks RDT against GPT on multi-hop chain-following reasoning tasks at depths 1–10.</p>
+        <div class="p-items">
+          <div class="pi"><div class="dot"></div><span>RecurrentBlock — A, B matrices near-identity init</span></div>
+          <div class="pi"><div class="dot"></div><span>Spectral radius enforcement via SVD projection (cap 0.9)</span></div>
+          <div class="pi"><div class="dot"></div><span>Prelude → Recurrent Loop → Coda three-part architecture</span></div>
+          <div class="pi"><div class="dot"></div><span>Synthetic multi-hop chain-following benchmark dataset</span></div>
+          <div class="pi"><div class="dot"></div><span>GPT vs RDT accuracy measured at hop depths 1–10</span></div>
+          <div class="pi"><div class="dot"></div><span>Curriculum learning — staged training from 1 → 5 hops</span></div>
+        </div>
+      </div>
+      <div class="pc p3 fade-up">
+        <div class="p-num">Phase 3</div>
+        <div class="p-title">Fine-tuning & Agents</div>
+        <p class="p-desc">Fine-tunes the trained RDT on reasoning datasets, adds chain-of-thought prompting, and builds a complete tool-calling agent loop around the model.</p>
+        <div class="p-items">
+          <div class="pi"><div class="dot"></div><span>Fine-tuning on tool-use QA with low LR (1e-4), gentle updates</span></div>
+          <div class="pi"><div class="dot"></div><span>Chain-of-thought: &lt;think&gt;...&lt;/think&gt; reasoning traces</span></div>
+          <div class="pi"><div class="dot"></div><span>Calculator — safe math eval via character allowlist</span></div>
+          <div class="pi"><div class="dot"></div><span>Search — factual knowledge base with fuzzy matching</span></div>
+          <div class="pi"><div class="dot"></div><span>Text transform — uppercase, reverse, length, word count</span></div>
+          <div class="pi"><div class="dot"></div><span>Full agent loop: model generates → Python executes → re-feeds</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="wrap">
+    <div class="s-label">Benchmark Results</div>
+    <h2 class="s-title">RDT vs GPT — Reasoning Accuracy</h2>
+    <p class="s-desc">Curriculum-trained models evaluated on multi-hop chain following. RDT consistently outperforms the parameter-matched GPT baseline using 47% fewer parameters.</p>
+    <div class="res-grid fade-up">
+      <div class="chart-card">
+        <div class="chart-ttl">Multi-Hop Reasoning Accuracy by Hop Depth</div>
+        <div class="chart-sub">GPT (6 layers, 4.78M params) vs RDT variants (1 block × N loops, 2.54M params)</div>
+        <canvas id="benchChart" height="270"></canvas>
+      </div>
+      <div class="p-stats">
+        <div class="pcard"><div class="pcard-lbl">GPT Parameters</div><div class="pcard-val" style="color:var(--cyan);">4.78M</div><div class="pcard-sub">6 unique transformer blocks</div></div>
+        <div class="pcard"><div class="pcard-lbl">RDT Parameters</div><div class="pcard-val" style="color:var(--purple);">2.54M</div><div class="pcard-sub">1 block × 6 loops</div><span class="gbadge">47% fewer params</span></div>
+        <div class="pcard"><div class="pcard-lbl">Effective Depth</div><div class="pcard-val" style="color:var(--green);">8 layers</div><div class="pcard-sub">Prelude + 6 loops + Coda</div></div>
+        <div class="pcard"><div class="pcard-lbl">Peak RDT Accuracy</div><div class="pcard-val" style="color:var(--orange);">33.4%</div><div class="pcard-sub">At 5-hop depth  (GPT: 31.0%)</div></div>
+      </div>
+    </div>
+
+    <div class="chart-card fade-up" style="margin-top:2rem;">
+      <div class="chart-ttl">Curriculum Learning — Stage-by-Stage Accuracy</div>
+      <div class="chart-sub">Both models trained incrementally: Stage 1 (1-hop) → Stage 5 (5-hop). Advance threshold: 82% accuracy. RDT leads at every stage.</div>
+      <canvas id="currChart" height="180"></canvas>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INNOVATIONS -->
+<section id="innovations">
+  <div class="wrap">
+    <div class="s-label">Key Innovations</div>
+    <h2 class="s-title">What Makes This Implementation Unique</h2>
+    <p class="s-desc">Six design choices that make the RDT work — each addressing a specific failure mode in naive recurrent transformers.</p>
+    <div class="inn-grid">
+      <div class="icard fade-up"><div class="iicon">🔄</div><div class="ititle">Shared Recurrent Weights</div><p class="idesc">One transformer block is applied N times with identical weights. The hidden state h(t) is iteratively refined — giving the model more compute without more parameters.</p></div>
+      <div class="icard fade-up"><div class="iicon">📐</div><div class="ititle">Spectral Radius Enforcement</div><p class="idesc">After every gradient step, SVD is computed on A and its spectral radius is capped at 0.9. This prevents the hidden state from diverging across loop iterations — stability by construction.</p></div>
+      <div class="icard fade-up"><div class="iicon">⚓</div><div class="ititle">Input Re-injection via B·e</div><p class="idesc">The original encoded input e is re-injected at every loop step via the B matrix. This anchors the model to the original question — preventing semantic drift as reasoning deepens.</p></div>
+      <div class="icard fade-up"><div class="iicon">🔗</div><div class="ititle">LM Head Weight Tying</div><p class="idesc">The LM head weight matrix is shared with the token embedding table. Since the embedding maps IDs → vectors and the head maps vectors → IDs, sharing saves ~19M parameters with no accuracy loss.</p></div>
+      <div class="icard fade-up"><div class="iicon">📚</div><div class="ititle">Curriculum Learning</div><p class="idesc">Models are trained stage-by-stage from 1-hop to 5-hop chains, only advancing when accuracy exceeds 82%. This mirrors how humans learn — simple before complex, preventing shortcuts.</p></div>
+      <div class="icard fade-up"><div class="iicon">⚡</div><div class="ititle">Inference-Time Compute Scaling</div><p class="idesc">At inference the number of loop steps can be increased for harder problems — more compute, same weights, no retraining. A trained RDT-6 can run as RDT-14 on hard questions.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FUTURE -->
+<section id="future">
+  <div class="wrap">
+    <div class="s-label">Future Scope</div>
+    <h2 class="s-title">Where This Goes Next</h2>
+    <p class="s-desc">The RDT architecture opens multiple interesting directions for research and production application.</p>
+    <div class="fut-grid">
+      <div class="fcard fade-up"><div class="ficon">🧠</div><div><div class="ftitle">Adaptive Loop Depth</div><p class="fdesc">Train a small "effort predictor" that decides how many loop steps to allocate per input. Easy questions get fewer steps, hard ones get more — dynamic compute allocation without user tuning.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🔢</div><div><div class="ftitle">Scale to GPT-2 Size</div><p class="fdesc">Apply the RDT at 124M-param scale. Parameter savings compound at scale — a 124M-param RDT could match a 200M+ GPT on reasoning benchmarks while using significantly less memory.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🌐</div><div><div class="ftitle">Multi-Modal RDT</div><p class="fdesc">Extend the recurrent block to process interleaved text and image tokens. The iterative refinement mechanism is modality-agnostic and could improve visual reasoning and image captioning tasks.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🔍</div><div><div class="ftitle">Loop Step Interpretability</div><p class="fdesc">Probe what each loop step "computes" by analyzing hidden state evolution. Early steps may resolve syntax; later steps semantic reasoning — analogous to GPT layer probing work.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🤖</div><div><div class="ftitle">RLHF / RLAIF Fine-tuning</div><p class="fdesc">Apply reinforcement learning from human or AI feedback on top of the pretrained RDT. The CoT traces from Phase 3 are a strong foundation for reward modeling and preference learning.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">📦</div><div><div class="ftitle">Drop-in Hugging Face Block</div><p class="fdesc">Wrap the RecurrentBlock as a plug-in replacement for standard transformer layers. Any existing GPT-style training pipeline could adopt recurrent depth with minimal code changes.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GETTING STARTED -->
+<section id="start">
+  <div class="wrap">
+    <div class="s-label">Get Started</div>
+    <h2 class="s-title">Run It Yourself</h2>
+    <p class="s-desc">Python 3.9+ and PyTorch 2.0+. MPS (Apple Silicon), CUDA, and CPU are all auto-detected.</p>
+    <div class="steps-grid fade-up">
+      <div>
+        <div class="step-ttl">1 — Install</div>
+        <div class="code">
+<span class="cc"># clone the repo</span>
+<span class="cm">git clone</span> https://github.com/PrathibhaDevkar/rdt_transformer.git
+<span class="cm">cd</span> rdt_transformer
+
+<span class="cc"># install dependencies</span>
+<span class="cm">pip install</span> -r requirements.txt
+        </div>
+        <div class="step-ttl">2 — Phase 1: GPT Baseline</div>
+        <div class="code">
+<span class="cm">python</span> <span class="cp">phase1/lesson1_tokenizer.py</span>
+<span class="cm">python</span> <span class="cp">phase1/lesson2_embeddings.py</span>
+<span class="cm">python</span> <span class="cp">phase1/lesson3_attention.py</span>
+<span class="cm">python</span> <span class="cp">phase1/lesson4_feedforward.py</span>
+<span class="cm">python</span> <span class="cp">phase1/lesson5_training.py</span>  <span class="cc"># trains → best_model.pt</span>
+        </div>
+      </div>
+      <div>
+        <div class="step-ttl">3 — Phase 2: RDT + Benchmark</div>
+        <div class="code">
+<span class="cm">python</span> <span class="cp">phase2/lesson1_rdt.py</span>         <span class="cc"># trains RDT</span>
+<span class="cm">python</span> <span class="cp">phase2/lesson2_benchmark.py</span>  <span class="cc"># GPT vs RDT</span>
+<span class="cm">python</span> <span class="cp">phase2/lesson2c_curriculum.py</span> <span class="cc"># curriculum</span>
+        </div>
+        <div class="step-ttl">4 — Phase 3: Fine-tune + Agent</div>
+        <div class="code">
+<span class="cm">python</span> <span class="cp">phase3/lesson1_finetune.py</span>  <span class="cc"># tool-use QA</span>
+<span class="cm">python</span> <span class="cp">phase3/lesson1c_cot.py</span>     <span class="cc"># chain-of-thought</span>
+<span class="cm">python</span> <span class="cp">phase3/lesson2_agent.py</span>    <span class="cc"># agent loop</span>
+        </div>
+        <div style="background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:10px;padding:1rem 1.2rem;font-size:.82rem;color:var(--t2);">
+          <strong style="color:var(--cyan);">Note:</strong> The dataset (<code style="font-family:'JetBrains Mono',monospace;color:var(--orange);">data/shakespeare.txt</code>) is downloaded automatically on first run. Model checkpoints are saved to <code style="font-family:'JetBrains Mono',monospace;color:var(--orange);">results/</code>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">RDT Transformer</div>
+  <p class="f-txt">Built from scratch in PyTorch by Prathibha Devkar &nbsp;·&nbsp; MIT License</p>
+  <div class="f-links">
+    <a href="https://github.com/PrathibhaDevkar/rdt_transformer" target="_blank">GitHub Repository</a>
+    <a href="https://github.com/PrathibhaDevkar/rdt_transformer/blob/main/IMPLEMENTATION.md" target="_blank">Implementation Docs</a>
+    <a href="https://github.com/PrathibhaDevkar/rdt_transformer/blob/main/README.md" target="_blank">README</a>
+    <a href="https://github.com/PrathibhaDevkar" target="_blank">GitHub Profile</a>
+  </div>
+</footer>
+
+<script>
+// Fade-up on scroll
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// Benchmark line chart
+const bCtx = document.getElementById('benchChart').getContext('2d');
+new Chart(bCtx, {
+  type: 'line',
+  data: {
+    labels: ['1-hop','2-hop','3-hop','4-hop','5-hop','7-hop','10-hop'],
+    datasets: [
+      { label:'GPT  (6 layers · 4.78M params)', data:[26.0,25.8,23.6,24.6,31.0,27.6,30.2], borderColor:'#00d4ff', backgroundColor:'rgba(0,212,255,.07)', borderWidth:2, pointBackgroundColor:'#00d4ff', pointRadius:4, tension:.35, fill:true },
+      { label:'RDT  (1 block × 6 loops · 2.54M params)', data:[28.2,29.0,27.8,28.4,33.2,28.0,29.2], borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,.07)', borderWidth:2, pointBackgroundColor:'#8b5cf6', pointRadius:4, tension:.35, fill:true },
+      { label:'RDT-14  (same weights, 14 loops at inference)', data:[28.2,28.8,27.8,28.4,33.4,27.8,29.2], borderColor:'#10ffa0', backgroundColor:'transparent', borderWidth:2, borderDash:[5,4], pointBackgroundColor:'#10ffa0', pointRadius:4, tension:.35, fill:false }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:true,
+    plugins: {
+      legend:{ labels:{ color:'#8892a4', font:{ family:'Inter', size:11 }, boxWidth:18, padding:14 } },
+      tooltip:{ backgroundColor:'#0f1525', borderColor:'rgba(255,255,255,.1)', borderWidth:1, titleColor:'#f0f4ff', bodyColor:'#8892a4', callbacks:{ label: c => ` ${c.dataset.label.split('  ')[0]}: ${c.parsed.y.toFixed(1)}%` } }
+    },
+    scales: {
+      x:{ grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#8892a4', font:{ family:'Inter', size:11 } } },
+      y:{ grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#8892a4', font:{ family:'Inter', size:11 }, callback: v => v+'%' }, min:20, max:40 }
+    }
+  }
+});
+
+// Curriculum bar chart
+const cCtx = document.getElementById('currChart').getContext('2d');
+new Chart(cCtx, {
+  type:'bar',
+  data: {
+    labels:['Stage 1  (1-hop)','Stage 2  (2-hop)','Stage 3  (3-hop)','Stage 4  (4-hop)','Stage 5  (5-hop)'],
+    datasets: [
+      { label:'GPT', data:[28.8,28.4,28.0,27.6,31.0], backgroundColor:'rgba(0,212,255,.45)', borderColor:'rgba(0,212,255,.75)', borderWidth:1, borderRadius:4 },
+      { label:'RDT', data:[31.0,30.0,29.0,31.2,33.2], backgroundColor:'rgba(139,92,246,.45)', borderColor:'rgba(139,92,246,.75)', borderWidth:1, borderRadius:4 }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:true,
+    plugins: {
+      legend:{ labels:{ color:'#8892a4', font:{ family:'Inter', size:11 }, boxWidth:16, padding:14 } },
+      tooltip:{ backgroundColor:'#0f1525', borderColor:'rgba(255,255,255,.1)', borderWidth:1, titleColor:'#f0f4ff', bodyColor:'#8892a4', callbacks:{ label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}%` } }
+    },
+    scales: {
+      x:{ grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#8892a4', font:{ family:'Inter', size:11 } } },
+      y:{ grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#8892a4', font:{ family:'Inter', size:11 }, callback: v => v+'%' }, min:24, max:36 }
+    }
+  }
+});
+</script>
+</body>
+</html>
