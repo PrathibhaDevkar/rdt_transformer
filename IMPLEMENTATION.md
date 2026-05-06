@@ -115,7 +115,7 @@ Builds a standard GPT-style transformer from scratch on TinyShakespeare.
 - `N_EMBED = 384`, `N_HEADS = 6`, `N_LAYERS = 4`, `BLOCK_SIZE = 128`, `BATCH_SIZE = 16`
 - `LEARNING_RATE = 3e-4`, `MAX_ITERS = 5000`
 - Weight tying: `lm_head.weight = token_emb_table.weight` (saves ~19M params)
-- Unique parameters: ~10M
+- Unique parameters: ~26M (dominated by the 50,257-token vocabulary embedding at 19.3M)
 
 ### Phase 2 — RDT Architecture (`phase2/`)
 
