@@ -222,7 +222,7 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
   <div class="hero-content">
     <div class="badge">FROM-SCRATCH PYTORCH IMPLEMENTATION</div>
     <h1>Recurrent Depth<br><span class="grad">Transformer</span></h1>
-    <p class="hero-sub">A transformer that thinks deeper — the same weights, more iterations, 47% fewer parameters than a comparable GPT, with stronger multi-hop reasoning.</p>
+    <p class="hero-sub">A transformer that thinks deeper. Same weights, more iterations, 47% fewer parameters than a comparable GPT, with stronger multi-hop reasoning.</p>
     <div class="stats">
       <div class="stat"><span class="stat-n">3</span><span class="stat-l">Training Phases</span></div>
       <div class="stat"><span class="stat-n">47%</span><span class="stat-l">Fewer Parameters</span></div>
@@ -249,8 +249,8 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
       <div>
         <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">The Core Idea</h3>
         <p style="color:var(--t2);font-size:.95rem;line-height:1.85;margin-bottom:1.2rem;">A standard GPT needs N unique transformer blocks for N layers of reasoning. The RDT achieves the same effective depth using <strong style="color:var(--t1)">one block applied N times</strong> — sharing weights across all loop steps.</p>
-        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;margin-bottom:1.2rem;">At each loop step the model refines its hidden state h using the update rule on the right. The original encoded input <code style="color:var(--cyan);background:rgba(0,212,255,.09);padding:.1em .35em;border-radius:3px;font-family:'JetBrains Mono',monospace;">e</code> is re-injected every step as an anchor — the model never forgets what was originally asked.</p>
-        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;">At inference you can run more loops on harder questions — <strong style="color:var(--t1)">more reasoning compute with zero retraining</strong> and no new parameters.</p>
+        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;margin-bottom:1.2rem;">At each loop step the model refines its hidden state h using the update rule on the right. The original encoded input <code style="color:var(--cyan);background:rgba(0,212,255,.09);padding:.1em .35em;border-radius:3px;font-family:'JetBrains Mono',monospace;">e</code> is re-injected every step as an anchor so the model never loses track of what was originally asked.</p>
+        <p style="color:var(--t2);font-size:.95rem;line-height:1.85;">At inference you can run more loops on harder questions, getting <strong style="color:var(--t1)">more reasoning compute with zero retraining</strong> and no new parameters.</p>
       </div>
       <div class="eq-box">
         <div class="eq-lbl">Core Update Rule — Applied Each Loop Step</div>
@@ -514,12 +514,12 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
     <h2 class="s-title">What Makes This Implementation Unique</h2>
     <p class="s-desc">Six design choices that make the RDT work — each addressing a specific failure mode in naive recurrent transformers.</p>
     <div class="inn-grid">
-      <div class="icard fade-up"><div class="iicon">🔄</div><div class="ititle">Shared Recurrent Weights</div><p class="idesc">One transformer block is applied N times with identical weights. The hidden state h(t) is iteratively refined — giving the model more compute without more parameters.</p></div>
-      <div class="icard fade-up"><div class="iicon">📐</div><div class="ititle">Spectral Radius Enforcement</div><p class="idesc">After every gradient step, SVD is computed on A and its spectral radius is capped at 0.9. This prevents the hidden state from diverging across loop iterations — stability by construction.</p></div>
-      <div class="icard fade-up"><div class="iicon">⚓</div><div class="ititle">Input Re-injection via B·e</div><p class="idesc">The original encoded input e is re-injected at every loop step via the B matrix. This anchors the model to the original question — preventing semantic drift as reasoning deepens.</p></div>
-      <div class="icard fade-up"><div class="iicon">🔗</div><div class="ititle">LM Head Weight Tying</div><p class="idesc">The LM head weight matrix is shared with the token embedding table. Since the embedding maps IDs → vectors and the head maps vectors → IDs, sharing saves ~19M parameters with no accuracy loss.</p></div>
-      <div class="icard fade-up"><div class="iicon">📚</div><div class="ititle">Curriculum Learning</div><p class="idesc">Models are trained stage-by-stage from 1-hop to 5-hop chains, only advancing when accuracy exceeds 82%. This mirrors how humans learn — simple before complex, preventing shortcuts.</p></div>
-      <div class="icard fade-up"><div class="iicon">⚡</div><div class="ititle">Inference-Time Compute Scaling</div><p class="idesc">At inference the number of loop steps can be increased for harder problems — more compute, same weights, no retraining. A trained RDT-6 can run as RDT-14 on hard questions.</p></div>
+      <div class="icard fade-up"><div class="iicon">🔄</div><div class="ititle">Shared Recurrent Weights</div><p class="idesc">One transformer block is applied N times with identical weights. The hidden state h(t) is iteratively refined, giving the model more compute per parameter than a standard stacked architecture.</p></div>
+      <div class="icard fade-up"><div class="iicon">📐</div><div class="ititle">Spectral Radius Enforcement</div><p class="idesc">After every gradient step, SVD is computed on A and its spectral radius is capped at 0.9. This keeps the hidden state from diverging across loop iterations and makes training reliably stable.</p></div>
+      <div class="icard fade-up"><div class="iicon">⚓</div><div class="ititle">Input Re-injection via B·e</div><p class="idesc">The original encoded input e is re-injected at every loop step via the B matrix. This keeps the model grounded in the original question and prevents drift as reasoning deepens.</p></div>
+      <div class="icard fade-up"><div class="iicon">🔗</div><div class="ititle">LM Head Weight Tying</div><p class="idesc">The LM head weight matrix is shared with the token embedding table. Since the embedding maps IDs to vectors and the head maps vectors back to IDs, sharing saves ~19M parameters with no accuracy loss.</p></div>
+      <div class="icard fade-up"><div class="iicon">📚</div><div class="ititle">Curriculum Learning</div><p class="idesc">Models are trained stage-by-stage from 1-hop to 5-hop chains, only advancing when accuracy exceeds 82%. Starting simple and building up prevents the model from learning shortcuts on hard examples.</p></div>
+      <div class="icard fade-up"><div class="iicon">⚡</div><div class="ititle">Inference-Time Compute Scaling</div><p class="idesc">At inference the number of loop steps can be increased for harder problems, with no retraining and no new weights. A model trained with 6 loops can run 14 loops on a hard question at test time.</p></div>
     </div>
   </div>
 </section>
@@ -533,12 +533,12 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
     <h2 class="s-title">Where This Goes Next</h2>
     <p class="s-desc">The RDT architecture opens multiple interesting directions for research and production application.</p>
     <div class="fut-grid">
-      <div class="fcard fade-up"><div class="ficon">🧠</div><div><div class="ftitle">Adaptive Loop Depth</div><p class="fdesc">Train a small "effort predictor" that decides how many loop steps to allocate per input. Easy questions get fewer steps, hard ones get more — dynamic compute allocation without user tuning.</p></div></div>
-      <div class="fcard fade-up"><div class="ficon">🔢</div><div><div class="ftitle">Scale to GPT-2 Size</div><p class="fdesc">Apply the RDT at 124M-param scale. Parameter savings compound at scale — a 124M-param RDT could match a 200M+ GPT on reasoning benchmarks while using significantly less memory.</p></div></div>
-      <div class="fcard fade-up"><div class="ficon">🌐</div><div><div class="ftitle">Multi-Modal RDT</div><p class="fdesc">Extend the recurrent block to process interleaved text and image tokens. The iterative refinement mechanism is modality-agnostic and could improve visual reasoning and image captioning tasks.</p></div></div>
-      <div class="fcard fade-up"><div class="ficon">🔍</div><div><div class="ftitle">Loop Step Interpretability</div><p class="fdesc">Probe what each loop step "computes" by analyzing hidden state evolution. Early steps may resolve syntax; later steps semantic reasoning — analogous to GPT layer probing work.</p></div></div>
-      <div class="fcard fade-up"><div class="ficon">🤖</div><div><div class="ftitle">RLHF / RLAIF Fine-tuning</div><p class="fdesc">Apply reinforcement learning from human or AI feedback on top of the pretrained RDT. The CoT traces from Phase 3 are a strong foundation for reward modeling and preference learning.</p></div></div>
-      <div class="fcard fade-up"><div class="ficon">📦</div><div><div class="ftitle">Drop-in Hugging Face Block</div><p class="fdesc">Wrap the RecurrentBlock as a plug-in replacement for standard transformer layers. Any existing GPT-style training pipeline could adopt recurrent depth with minimal code changes.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🧠</div><div><div class="ftitle">Adaptive Loop Depth</div><p class="fdesc">Train a small effort predictor that decides how many loop steps to allocate per input. Easy questions get fewer steps, hard ones get more, with dynamic compute allocation that needs no user tuning.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🔢</div><div><div class="ftitle">Scale to GPT-2 Size</div><p class="fdesc">Apply the RDT at 124M-param scale. The parameter savings compound at larger sizes, so a 124M-param RDT could realistically match a 200M+ GPT on reasoning benchmarks while using significantly less memory.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🌐</div><div><div class="ftitle">Multi-Modal RDT</div><p class="fdesc">Extend the recurrent block to handle interleaved text and image tokens. The iterative refinement mechanism is modality-agnostic and could improve visual reasoning and image captioning tasks.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🔍</div><div><div class="ftitle">Loop Step Interpretability</div><p class="fdesc">Probe what each loop step computes by analyzing hidden state evolution across iterations. Early steps likely resolve syntax while later steps handle semantic reasoning, similar to GPT layer probing work.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">🤖</div><div><div class="ftitle">RLHF Fine-tuning</div><p class="fdesc">Apply reinforcement learning from human or AI feedback on top of the pretrained RDT. The chain-of-thought traces generated in Phase 3 are a solid starting point for reward modeling and preference learning.</p></div></div>
+      <div class="fcard fade-up"><div class="ficon">📦</div><div><div class="ftitle">Drop-in Hugging Face Block</div><p class="fdesc">Wrap the RecurrentBlock as a replacement for standard transformer layers. Any existing GPT-style training pipeline could pick up recurrent depth with just a few lines of code changed.</p></div></div>
     </div>
   </div>
 </section>
