@@ -136,8 +136,41 @@ section{padding:6rem 2rem;}
 .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:.45rem;}
 .p1 .dot{background:var(--cyan);}.p2 .dot{background:var(--purple);}.p3 .dot{background:var(--green);}
 
+/* AGENT */
+#agent{background:var(--bg0);}
+.agent-loop{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:.5rem 0;margin-bottom:3rem;}
+.al-block{display:flex;flex-direction:column;align-items:center;gap:.4rem;min-width:100px;}
+.al-box{border-radius:9px;padding:.6rem .9rem;font-size:.72rem;font-weight:600;text-align:center;border:1px solid;line-height:1.4;}
+.al-box.model{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.35);color:#a78bfa;}
+.al-box.tool{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.28);color:var(--cyan);}
+.al-box.exec{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.25);color:var(--orange);}
+.al-box.ans{background:rgba(16,255,160,.07);border-color:rgba(16,255,160,.28);color:var(--green);}
+.al-lbl{font-size:.6rem;color:var(--t3);text-align:center;}
+.al-arr{color:var(--t3);font-size:1rem;margin:0 .15rem;padding-bottom:1rem;}
+.al-loop{color:var(--t3);font-size:.65rem;text-align:center;border-top:1px dashed rgba(139,92,246,.3);padding-top:.4rem;margin-top:.2rem;}
+
+.terminal{background:#030508;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;margin-bottom:1.5rem;}
+.term-bar{display:flex;align-items:center;gap:.4rem;padding:.75rem 1rem;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);}
+.term-dot{width:10px;height:10px;border-radius:50%;}
+.term-dot.r{background:#ff5f57;}.term-dot.y{background:#ffbd2e;}.term-dot.g{background:#28c840;}
+.term-title{font-size:.75rem;color:var(--t3);margin-left:.4rem;font-family:'JetBrains Mono',monospace;}
+.term-body{padding:1.25rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.9;}
+.t-task{color:#f0f4ff;font-weight:600;}
+.t-label{color:var(--t3);}
+.t-tool{color:var(--cyan);}
+.t-result{color:var(--green);}
+.t-answer{color:#a78bfa;font-weight:600;}
+.t-done{color:var(--t3);font-style:italic;}
+.t-sep{color:rgba(255,255,255,.08);}
+
+.agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.agent-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;}
+.astat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center;}
+.astat-n{font-size:1.8rem;font-weight:800;}
+.astat-l{font-size:.72rem;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}
+
 /* RESULTS */
-#results{background:var(--bg0);}
+#results{background:var(--bg1);}
 .res-grid{display:grid;grid-template-columns:2fr 1fr;gap:2rem;}
 .chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2rem;}
 .chart-ttl{font-size:.95rem;font-weight:600;margin-bottom:.3rem;}
@@ -208,6 +241,7 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
     <li><a href="#concept">Concept</a></li>
     <li><a href="#architecture">Architecture</a></li>
     <li><a href="#phases">Phases</a></li>
+    <li><a href="#agent">Agent</a></li>
     <li><a href="#results">Results</a></li>
     <li><a href="#innovations">Innovations</a></li>
     <li><a href="#future">Future</a></li>
@@ -471,6 +505,153 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
           <div class="pi"><div class="dot"></div><span>Full agent loop: model generates → Python executes → re-feeds</span></div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- AGENT -->
+<section id="agent">
+  <div class="wrap">
+    <div class="s-label">Phase 3 Output</div>
+    <h2 class="s-title">Agent in Action</h2>
+    <p class="s-desc">The RDT is fine-tuned to generate structured tool calls, execute them in Python, and fold results back into context until it has enough to answer.</p>
+
+    <!-- Agent loop diagram -->
+    <div class="agent-loop fade-up">
+      <div class="al-block">
+        <div class="al-box model">RDT Model<br><small style="opacity:.7">generates</small></div>
+        <div class="al-lbl">recurrent core</div>
+      </div>
+      <div class="al-arr">→</div>
+      <div class="al-block">
+        <div class="al-box tool">Tool Call<br><small style="opacity:.7">{"tool": "..."}</small></div>
+        <div class="al-lbl">JSON structured</div>
+      </div>
+      <div class="al-arr">→</div>
+      <div class="al-block">
+        <div class="al-box exec">Python<br><small style="opacity:.7">executes</small></div>
+        <div class="al-lbl">calculator / search / transform</div>
+      </div>
+      <div class="al-arr">→</div>
+      <div class="al-block">
+        <div class="al-box tool">Result<br><small style="opacity:.7">&lt;r&gt;...&lt;/r&gt;</small></div>
+        <div class="al-lbl">appended to context</div>
+      </div>
+      <div class="al-arr">→</div>
+      <div class="al-block">
+        <div class="al-box model">RDT Model<br><small style="opacity:.7">re-reads</small></div>
+        <div class="al-lbl">loop repeats</div>
+      </div>
+      <div class="al-arr">→</div>
+      <div class="al-block">
+        <div class="al-box ans">Answer<br><small style="opacity:.7">&lt;answer&gt;</small></div>
+        <div class="al-lbl">final output</div>
+      </div>
+    </div>
+
+    <!-- Terminal outputs -->
+    <div class="agent-grid fade-up">
+      <!-- Single-step tasks -->
+      <div>
+        <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1rem;">Single-Step Tasks</p>
+
+        <div class="terminal">
+          <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
+          <div class="term-body">
+            <span class="t-label">TASK  </span><span class="t-task">What is 15 multiplied by 8?</span><br>
+            <span class="t-sep">────────────────────────────────────────</span><br>
+            <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "calculator", "input": "15 * 8"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">120.0</span><br>
+            <span class="t-label">Step 2 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+            <span class="t-label">  </span><span class="t-answer">120</span><br>
+            <span class="t-done">  Done in 0.8s · 1 tool call</span>
+          </div>
+        </div>
+
+        <div class="terminal">
+          <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
+          <div class="term-body">
+            <span class="t-label">TASK  </span><span class="t-task">What is the capital of Germany?</span><br>
+            <span class="t-sep">────────────────────────────────────────</span><br>
+            <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "capital of germany"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">Berlin</span><br>
+            <span class="t-label">Step 2 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+            <span class="t-label">  </span><span class="t-answer">Berlin</span><br>
+            <span class="t-done">  Done in 0.7s · 1 tool call</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-step tasks -->
+      <div>
+        <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1rem;">Multi-Step Tasks</p>
+
+        <div class="terminal">
+          <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
+          <div class="term-body">
+            <span class="t-label">TASK  </span><span class="t-task">Find the capital of Japan and convert to uppercase.</span><br>
+            <span class="t-sep">────────────────────────────────────────</span><br>
+            <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "capital of japan"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">Tokyo</span><br>
+            <span class="t-label">Step 2 </span><span style="color:var(--orange);">[TOOL]</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "transform", "op": "upper", "input": "Tokyo"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">TOKYO</span><br>
+            <span class="t-label">Step 3 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+            <span class="t-label">  </span><span class="t-answer">TOKYO</span><br>
+            <span class="t-done">  Done in 1.4s · 2 tool calls</span>
+          </div>
+        </div>
+
+        <div class="terminal">
+          <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
+          <div class="term-body">
+            <span class="t-label">TASK  </span><span class="t-task">Find the inventor of the telephone and reverse their name.</span><br>
+            <span class="t-sep">────────────────────────────────────────</span><br>
+            <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "inventor of telephone"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">Alexander Graham Bell</span><br>
+            <span class="t-label">Step 2 </span><span style="color:var(--orange);">[TOOL]</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "transform", "op": "reverse", "input": "Alexander Graham Bell"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">lleB maharG rednaxelA</span><br>
+            <span class="t-label">Step 3 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+            <span class="t-label">  </span><span class="t-answer">lleB maharG rednaxelA</span><br>
+            <span class="t-done">  Done in 1.6s · 2 tool calls</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo task — 3-step chain -->
+    <div class="fade-up">
+      <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1rem;">3-Step Chain (search → calculate → answer)</p>
+      <div class="terminal">
+        <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run — demo task</span></div>
+        <div class="term-body">
+          <span class="t-label">TASK  </span><span class="t-task">What is the year of the moon landing? Multiply it by 2 and subtract 3000.</span><br>
+          <span class="t-sep">────────────────────────────────────────────────────────</span><br>
+          <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
+          <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "year of moon landing"}</span><br>
+          <span class="t-label">  result </span><span class="t-result">1969</span><br>
+          <span class="t-label">Step 2 </span><span style="color:var(--orange);">[TOOL]</span><br>
+          <span class="t-label">  call   </span><span class="t-tool">{"tool": "calculator", "input": "1969 * 2 - 3000"}</span><br>
+          <span class="t-label">  result </span><span class="t-result">938.0</span><br>
+          <span class="t-label">Step 3 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+          <span class="t-label">  </span><span class="t-answer">938</span><br>
+          <span class="t-done">  Done in 2.1s · 2 tool calls</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary stats -->
+    <div class="agent-stats fade-up">
+      <div class="astat"><div class="astat-n" style="color:var(--cyan);">3</div><div class="astat-l">Tools Available</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--purple);">4</div><div class="astat-l">Max Loop Steps</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--green);">2.54M</div><div class="astat-l">Model Parameters</div></div>
     </div>
   </div>
 </section>
