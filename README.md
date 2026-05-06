@@ -38,13 +38,13 @@ rdt_transformer/
 
 ## Phases
 
-### Phase 1 — GPT Baseline
+### Phase 1 - GPT Baseline
 Builds a standard GPT-style transformer from scratch on TinyShakespeare. Covers tokenization (BPE via tiktoken), positional embeddings, multi-head self-attention, feed-forward layers, and full training.
 
-### Phase 2 — RDT Architecture
+### Phase 2 - RDT Architecture
 Introduces the recurrent block with learned `A` and `B` matrices and a fixed-iteration loop. Benchmarks RDT vs GPT on multi-hop reasoning tasks across hop depths 1–10. Includes curriculum learning experiments.
 
-### Phase 3 — Fine-tuning and Agents
+### Phase 3 - Fine-tuning and Agents
 Fine-tunes the trained RDT on reasoning datasets, adds chain-of-thought (CoT) prompting, and builds a tool-calling agent loop backed by the RDT model.
 
 ## Setup
