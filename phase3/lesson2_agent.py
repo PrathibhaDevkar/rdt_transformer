@@ -363,7 +363,7 @@ for task in single_tasks:
     single_results.append(r)
 
 s_success = sum(1 for r in single_results if r['success'])
-print(f"\nSingle-step: {s_success}/{len(single_tasks)} completed")
+print(f"\nSingle-step: {s_success}/{len(single_tasks)} answered within step budget (not a correctness check)")
 
 
 # ════════════════════════════════════════════════════════════
@@ -388,7 +388,7 @@ for task in multi_tasks:
 
 m_success = sum(1 for r in multi_results if r['success'])
 avg_steps = sum(r['n_steps'] for r in multi_results)/len(multi_results)
-print(f"\nMulti-step: {m_success}/{len(multi_tasks)} completed")
+print(f"\nMulti-step: {m_success}/{len(multi_tasks)} answered within step budget (not a correctness check)")
 print(f"Avg tool calls: {avg_steps:.1f}")
 
 
