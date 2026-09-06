@@ -560,50 +560,48 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
         <div class="terminal">
           <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
           <div class="term-body">
-            <span class="t-label">TASK  </span><span class="t-task">What is 15 multiplied by 8?</span><br>
+            <span class="t-label">TASK  </span><span class="t-task">What is the largest planet?</span><br>
             <span class="t-sep">────────────────────────────────────────</span><br>
             <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
-            <span class="t-label">  call   </span><span class="t-tool">{"tool": "calculator", "input": "15 * 8"}</span><br>
-            <span class="t-label">  result </span><span class="t-result">120.0</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "largest planet"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">Jupiter</span><br>
             <span class="t-label">Step 2 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
-            <span class="t-label">  </span><span class="t-answer">120</span><br>
-            <span class="t-done">  Done in 0.8s · 1 tool call</span>
+            <span class="t-label">  </span><span class="t-answer">The largest planet is Jupiter.</span><br>
+            <span class="t-done">  Done in 3.9s · 1 tool call</span>
           </div>
         </div>
 
         <div class="terminal">
           <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
           <div class="term-body">
-            <span class="t-label">TASK  </span><span class="t-task">What is the capital of Germany?</span><br>
+            <span class="t-label">TASK  </span><span class="t-task">What is the boiling point of water?</span><br>
             <span class="t-sep">────────────────────────────────────────</span><br>
             <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
-            <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "capital of germany"}</span><br>
-            <span class="t-label">  result </span><span class="t-result">Berlin</span><br>
+            <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "boiling point of water"}</span><br>
+            <span class="t-label">  result </span><span class="t-result">100</span><br>
             <span class="t-label">Step 2 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
-            <span class="t-label">  </span><span class="t-answer">Berlin</span><br>
-            <span class="t-done">  Done in 0.7s · 1 tool call</span>
+            <span class="t-label">  </span><span class="t-answer">The boiling point of water is 100.</span><br>
+            <span class="t-done">  Done in 5.4s · 1 tool call</span>
           </div>
         </div>
       </div>
 
       <!-- Multi-step tasks -->
       <div>
-        <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1rem;">Multi-Step Tasks</p>
+        <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1rem;">Multi-Step Tasks — Current Limitation</p>
+        <p style="font-size:.8rem;color:var(--t2);margin:-.5rem 0 1rem;line-height:1.6;">This checkpoint reliably fires <em>one</em> tool call, but doesn't yet chain a second one even when the task explicitly asks for it — 0 of 9 multi-step prompts tested completed a follow-up step. Shown below verbatim rather than a fabricated success.</p>
 
         <div class="terminal">
           <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run</span></div>
           <div class="term-body">
-            <span class="t-label">TASK  </span><span class="t-task">Find the capital of Japan and convert to uppercase.</span><br>
+            <span class="t-label">TASK  </span><span class="t-task">Find the capital of Japan and convert it to uppercase.</span><br>
             <span class="t-sep">────────────────────────────────────────</span><br>
             <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
             <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "capital of japan"}</span><br>
             <span class="t-label">  result </span><span class="t-result">Tokyo</span><br>
-            <span class="t-label">Step 2 </span><span style="color:var(--orange);">[TOOL]</span><br>
-            <span class="t-label">  call   </span><span class="t-tool">{"tool": "transform", "op": "upper", "input": "Tokyo"}</span><br>
-            <span class="t-label">  result </span><span class="t-result">TOKYO</span><br>
-            <span class="t-label">Step 3 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
-            <span class="t-label">  </span><span class="t-answer">TOKYO</span><br>
-            <span class="t-done">  Done in 1.4s · 2 tool calls</span>
+            <span class="t-label">Step 2 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+            <span class="t-label">  </span><span class="t-answer">The capital of japan is Tokyo.</span><br>
+            <span class="t-done" style="color:var(--orange);">  Stopped after 1 tool call — never ran the uppercase step</span>
           </div>
         </div>
 
@@ -615,34 +613,10 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
             <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
             <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "inventor of telephone"}</span><br>
             <span class="t-label">  result </span><span class="t-result">Alexander Graham Bell</span><br>
-            <span class="t-label">Step 2 </span><span style="color:var(--orange);">[TOOL]</span><br>
-            <span class="t-label">  call   </span><span class="t-tool">{"tool": "transform", "op": "reverse", "input": "Alexander Graham Bell"}</span><br>
-            <span class="t-label">  result </span><span class="t-result">lleB maharG rednaxelA</span><br>
-            <span class="t-label">Step 3 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
-            <span class="t-label">  </span><span class="t-answer">lleB maharG rednaxelA</span><br>
-            <span class="t-done">  Done in 1.6s · 2 tool calls</span>
+            <span class="t-label">Step 2 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
+            <span class="t-label">  </span><span class="t-answer">The inventor of telephone is Alexander Graham Bell.</span><br>
+            <span class="t-done" style="color:var(--orange);">  Stopped after 1 tool call — never reversed the name</span>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Demo task — 3-step chain -->
-    <div class="fade-up">
-      <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1rem;">3-Step Chain (search → calculate → answer)</p>
-      <div class="terminal">
-        <div class="term-bar"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div><span class="term-title">agent run — demo task</span></div>
-        <div class="term-body">
-          <span class="t-label">TASK  </span><span class="t-task">What is the year of the moon landing? Multiply it by 2 and subtract 3000.</span><br>
-          <span class="t-sep">────────────────────────────────────────────────────────</span><br>
-          <span class="t-label">Step 1 </span><span style="color:var(--orange);">[TOOL]</span><br>
-          <span class="t-label">  call   </span><span class="t-tool">{"tool": "search", "input": "year of moon landing"}</span><br>
-          <span class="t-label">  result </span><span class="t-result">1969</span><br>
-          <span class="t-label">Step 2 </span><span style="color:var(--orange);">[TOOL]</span><br>
-          <span class="t-label">  call   </span><span class="t-tool">{"tool": "calculator", "input": "1969 * 2 - 3000"}</span><br>
-          <span class="t-label">  result </span><span class="t-result">938.0</span><br>
-          <span class="t-label">Step 3 </span><span style="color:#a78bfa;">[ANSWER]</span><br>
-          <span class="t-label">  </span><span class="t-answer">938</span><br>
-          <span class="t-done">  Done in 2.1s · 2 tool calls</span>
         </div>
       </div>
     </div>
@@ -650,8 +624,8 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
     <!-- Summary stats -->
     <div class="agent-stats fade-up">
       <div class="astat"><div class="astat-n" style="color:var(--cyan);">3</div><div class="astat-l">Tools Available</div></div>
-      <div class="astat"><div class="astat-n" style="color:var(--purple);">4</div><div class="astat-l">Max Loop Steps</div></div>
-      <div class="astat"><div class="astat-n" style="color:var(--green);">2.54M</div><div class="astat-l">Model Parameters</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--purple);">6</div><div class="astat-l">Recurrent Loop Steps</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--green);">24.99M</div><div class="astat-l">Agent Parameters</div></div>
     </div>
   </div>
 </section>
@@ -766,7 +740,7 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
 <span class="cm">python</span> <span class="cp">phase3/lesson2_agent.py</span>    <span class="cc"># agent loop</span>
         </div>
         <div style="background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:10px;padding:1rem 1.2rem;font-size:.82rem;color:var(--t2);">
-          <strong style="color:var(--cyan);">Note:</strong> The dataset (<code style="font-family:'JetBrains Mono',monospace;color:var(--orange);">data/shakespeare.txt</code>) is downloaded automatically on first run. Model checkpoints are saved to <code style="font-family:'JetBrains Mono',monospace;color:var(--orange);">results/</code>.
+          <strong style="color:var(--cyan);">Note:</strong> The dataset (<code style="font-family:'JetBrains Mono',monospace;color:var(--orange);">data/shakespeare.txt</code>) is included in the repo, so no download is needed. Model checkpoints are saved to <code style="font-family:'JetBrains Mono',monospace;color:var(--orange);">results/</code>.
         </div>
       </div>
     </div>

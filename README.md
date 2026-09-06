@@ -16,7 +16,7 @@ This lets the model "think longer" about hard problems without increasing parame
 
 ```
 rdt_transformer/
-├── data/               # TinyShakespeare dataset (auto-downloaded)
+├── data/               # TinyShakespeare dataset (included; re-downloaded if missing)
 ├── results/            # Benchmark plots and JSON results
 ├── phase1/             # GPT baseline — build a standard transformer
 │   ├── lesson1_tokenizer.py
@@ -65,7 +65,7 @@ python phase1/lesson2_embeddings.py
 # ... and so on
 ```
 
-The dataset (`data/shakespeare.txt`) is downloaded automatically on first run.
+The dataset (`data/shakespeare.txt`) is included in the repo, so no download is needed. If it's ever missing, `phase1/lesson1_tokenizer.py` will fetch it automatically on first run.
 
 ## Results
 
