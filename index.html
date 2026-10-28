@@ -256,11 +256,11 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
   <div class="hero-content">
     <div class="badge">FROM-SCRATCH PYTORCH IMPLEMENTATION</div>
     <h1>Recurrent Depth<br><span class="grad">Transformer</span></h1>
-    <p class="hero-sub">A transformer that thinks deeper. Same weights, more iterations, 47% fewer parameters than a comparable GPT, with stronger multi-hop reasoning.</p>
+    <p class="hero-sub">A transformer that thinks deeper. Same weights, more iterations, 47% fewer parameters than a comparable GPT, with comparable multi-hop accuracy.</p>
     <div class="stats">
       <div class="stat"><span class="stat-n">3</span><span class="stat-l">Training Phases</span></div>
       <div class="stat"><span class="stat-n">47%</span><span class="stat-l">Fewer Parameters</span></div>
-      <div class="stat"><span class="stat-n">10×</span><span class="stat-l">Reasoning Hops</span></div>
+      <div class="stat"><span class="stat-n">1–10</span><span class="stat-l">Hop Depths Tested</span></div>
       <div class="stat"><span class="stat-n">2.54M</span><span class="stat-l">RDT Parameters</span></div>
     </div>
     <div class="btns">
@@ -449,7 +449,7 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
           <div style="border-left:2px dashed rgba(139,92,246,.4);height:60px;"></div>
           <div class="vb rdt-d">Shared Block</div>
           <div style="font-size:.72rem;color:var(--purple);font-weight:700;">↩ looped × N</div>
-          <span class="vs-badge">~47% fewer params</span>
+          <span class="vs-badge">~47% fewer params (benchmark)</span>
         </div>
         <div class="vs-note">1 × block parameters</div>
       </div>
@@ -637,7 +637,7 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
   <div class="wrap">
     <div class="s-label">Benchmark Results</div>
     <h2 class="s-title">RDT vs GPT — Reasoning Accuracy</h2>
-    <p class="s-desc">Curriculum-trained models evaluated on multi-hop chain following. RDT consistently outperforms the parameter-matched GPT baseline using 47% fewer parameters.</p>
+    <p class="s-desc">Curriculum-trained models evaluated on multi-hop chain following. With 47% fewer parameters, RDT matches the 6-layer GPT baseline: it is ahead by about 2–4 points at the trained hop depths in this run, but both models stay only modestly above the ~17% chance level, and GPT is ahead at 10 hops.</p>
     <div class="res-grid fade-up">
       <div class="chart-card">
         <div class="chart-ttl">Multi-Hop Reasoning Accuracy by Hop Depth</div>
@@ -654,7 +654,7 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
 
     <div class="chart-card fade-up" style="margin-top:2rem;">
       <div class="chart-ttl">Curriculum Learning — Stage-by-Stage Accuracy</div>
-      <div class="chart-sub">Both models trained incrementally: Stage 1 (1-hop) → Stage 5 (5-hop). Advance threshold: 82% accuracy. RDT leads at every stage.</div>
+      <div class="chart-sub">Both models trained incrementally: Stage 1 (1-hop) → Stage 5 (5-hop). Advance threshold: 82% accuracy. RDT is ahead at every stage in this run (by about 1–4 points).</div>
       <canvas id="currChart" height="180"></canvas>
     </div>
   </div>
@@ -672,9 +672,9 @@ footer{background:var(--bg0);border-top:1px solid var(--border);padding:3rem 2re
       <div class="icard fade-up"><div class="iicon">🔄</div><div class="ititle">Shared Recurrent Weights</div><p class="idesc">One transformer block is applied N times with identical weights. The hidden state h(t) is iteratively refined, giving the model more compute per parameter than a standard stacked architecture.</p></div>
       <div class="icard fade-up"><div class="iicon">📐</div><div class="ititle">Spectral Radius Enforcement</div><p class="idesc">After every gradient step, SVD is computed on A and its spectral radius is capped at 0.9. This keeps the hidden state from diverging across loop iterations and makes training reliably stable.</p></div>
       <div class="icard fade-up"><div class="iicon">⚓</div><div class="ititle">Input Re-injection via B·e</div><p class="idesc">The original encoded input e is re-injected at every loop step via the B matrix. This keeps the model grounded in the original question and prevents drift as reasoning deepens.</p></div>
-      <div class="icard fade-up"><div class="iicon">🔗</div><div class="ititle">LM Head Weight Tying</div><p class="idesc">The LM head weight matrix is shared with the token embedding table. Since the embedding maps IDs to vectors and the head maps vectors back to IDs, sharing saves ~19M parameters with no accuracy loss.</p></div>
+      <div class="icard fade-up"><div class="iicon">🔗</div><div class="ititle">LM Head Weight Tying</div><p class="idesc">The LM head weight matrix is shared with the token embedding table. Since the embedding maps IDs to vectors and the head maps vectors back to IDs, sharing saves ~19M parameters.</p></div>
       <div class="icard fade-up"><div class="iicon">📚</div><div class="ititle">Curriculum Learning</div><p class="idesc">Models are trained stage-by-stage from 1-hop to 5-hop chains, only advancing when accuracy exceeds 82%. Starting simple and building up prevents the model from learning shortcuts on hard examples.</p></div>
-      <div class="icard fade-up"><div class="iicon">⚡</div><div class="ititle">Inference-Time Compute Scaling</div><p class="idesc">At inference the number of loop steps can be increased for harder problems, with no retraining and no new weights. A model trained with 6 loops can run 14 loops on a hard question at test time.</p></div>
+      <div class="icard fade-up"><div class="iicon">⚡</div><div class="ititle">Inference-Time Compute Scaling</div><p class="idesc">At inference the number of loop steps can be increased for harder problems, with no retraining and no new weights. A model trained with 6 loops can run 14 loops on a hard question at test time. In these benchmarks, though, extra loops did not change accuracy.</p></div>
     </div>
   </div>
 </section>

@@ -138,7 +138,7 @@ Introduces the recurrent loop and benchmarks RDT against GPT.
 - Vocabulary: PAD/EOS/SEP/ARR + entity tokens + relation tokens
 - Chains of (entity, relation, entity) triplets; model predicts terminal entity
 - Tests generalization to unseen hop depths (trained ≤5 hops, tested at 7 and 10)
-- Results (v3, curriculum-trained): RDT consistently outperforms parameter-matched GPT, especially at higher hop depths
+- Results (v3, curriculum-trained): RDT is ahead of the 6-layer GPT by about 2–4 points at hop depths 1–5 and roughly level at 7 and 10 (GPT is ahead by 1.0 at 10 hops). Both models stay near the ~17% chance level, so this is parity with fewer parameters, not a clear reasoning advantage
 
 **Parameter comparison (N_EMBED=256, 6 loops):**
 - GPT (6 unique blocks): ~4.78M parameters
@@ -227,10 +227,10 @@ python phase3/lesson2_agent.py        # agent loop → best_rdt_agent.pt
 
 Benchmark results are in `results/`. The key finding across all benchmark variants:
 
-- **RDT uses ~47% fewer parameters** than a parameter-matched GPT with the same effective depth
-- **RDT outperforms GPT** on multi-hop reasoning accuracy consistently across hop depths
-- **Curriculum-trained RDT** (lesson2c) shows the strongest generalization to out-of-distribution hop depths (7 and 10)
-- **Inference-time compute scaling**: RDT can use more loop steps at inference for harder problems without retraining
+- **RDT uses ~47% fewer parameters** than the 6-layer GPT baseline (46.3–46.8% across the three benchmark variants)
+- **Accuracy is comparable, not better**: identical to GPT on the first variant (100% at 1–5 hops, chance at 7 and 10), and within about 4 points either way on the two harder variants, where both models stay near the ~17% chance level (500 test examples per hop depth, one run each)
+- **Out-of-distribution depths (7 and 10)**: on v3 both models score about the same as at the trained depths (24–33% everywhere), which reflects that neither learned the task well, not generalization
+- **Inference-time compute scaling**: RDT can use more loop steps at inference without retraining, but in these benchmarks extra loops did not change accuracy (within 0.6 points)
 
 Benchmark v3 accuracy (curriculum-trained, N_EMBED=256):
 

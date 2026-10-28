@@ -69,4 +69,4 @@ The dataset (`data/shakespeare.txt`) is included in the repo, so no download is 
 
 ## Results
 
-Benchmark plots and raw JSON results are in `results/`. The RDT consistently outperforms a parameter-matched GPT baseline on multi-hop reasoning tasks, with the gap widening at higher hop depths.
+Benchmark plots and raw JSON results are in `results/`. Across the three benchmark variants, the RDT matches the 6-layer GPT baseline with ~47% fewer parameters (0.64M vs 1.20M, 0.65M vs 1.21M, and 2.54M vs 4.78M). On the first (a fixed-rule chain task) both models score 100% at 1–5 hops and fall to chance at the unseen depths 7 and 10. On the two harder in-context lookup tasks both models stay only modestly above the ~17% chance level, with the RDT within about 4 points of GPT either way (500 test examples per hop depth, one run each). Running extra loops at inference did not change accuracy in any of them, so the benchmarks show parameter efficiency at comparable accuracy, not a reasoning advantage.
