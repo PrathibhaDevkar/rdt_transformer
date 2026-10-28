@@ -494,9 +494,10 @@ for n_hops in [7, 10]:
     print(f"  GPT:           {gpt_acc:.1f}%  (fixed {N_LAYERS_GPT} layers)")
     print(f"  RDT (6 loops): {rdt_6:.1f}%  (trained setting)")
     print(f"  RDT (14 loops):{rdt_14:.1f}%  (more inference compute)")
-    if gain > 2:
+    # Gaps under ~5 points are within sampling noise at this test-set size
+    if gain > 5:
         print(f"  → More loops helped: +{gain:.1f}% accuracy ✅")
-    elif gpt_acc < 50 and rdt_14 > gpt_acc:
+    elif gpt_acc < 50 and rdt_14 > gpt_acc + 5:
         print(f"  → RDT outperformed GPT at inference time ✅")
     else:
         print(f"  → Both models struggled — task may need more training")
